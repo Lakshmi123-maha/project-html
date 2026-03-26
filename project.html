@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Maha Lakshmi ECOMMERCE Website</title>
+
+<style>
+
+body{
+margin:0;
+font-family:Arial;
+background:linear-gradient(120deg,#ffd6e7,#d4ffea);
+text-align:center;
+}
+
+/* HEADER */
+
+header{
+background:white;
+padding:20px;
+font-size:28px;
+font-weight:bold;
+color:#ff4081;
+box-shadow:0 3px 10px rgba(0,0,0,0.1);
+}
+
+/* PAGES */
+
+.page{
+display:none;
+margin-top:40px;
+}
+
+/* LOGIN BACKGROUND */
+
+#userLogin,#adminLogin,#register{
+background-image:url("https://images.unsplash.com/photo-1507525428034-b723cf961d3e");
+background-size:cover;
+background-position:center;
+padding:80px 0;
+}
+
+/* INPUT */
+
+input{
+padding:12px;
+margin:8px;
+border-radius:10px;
+border:none;
+width:220px;
+box-shadow:0 2px 5px rgba(0,0,0,0.2);
+}
+
+/* BUTTON */
+
+button{
+padding:12px 18px;
+border:none;
+border-radius:10px;
+cursor:pointer;
+margin:6px;
+font-weight:bold;
+background:#ff7eb3;
+color:white;
+transition:0.3s;
+}
+
+button:hover{
+background:#4caf50;
+transform:scale(1.05);
+}
+
+/* PRODUCT GRID */
+
+.container{
+display:flex;
+flex-wrap:wrap;
+justify-content:center;
+gap:35px;
+padding:40px;
+}
+
+/* CARD */
+
+.card{
+background:rgba(255,255,255,0.7);
+backdrop-filter:blur(10px);
+padding:20px;
+border-radius:20px;
+width:230px;
+box-shadow:0 10px 20px rgba(0,0,0,0.2);
+transition:0.3s;
+}
+
+.card:hover{
+transform:translateY(-10px);
+}
+
+/* PRODUCT IMAGE */
+
+.card img{
+width:200px;
+height:130px;
+border-radius:12px;
+transition:0.4s;
+}
+
+.card img:hover{
+transform:scale(1.1);
+}
+
+/* CART */
+
+.cart{
+position:fixed;
+top:20px;
+right:20px;
+background:white;
+padding:10px 15px;
+border-radius:10px;
+font-weight:bold;
+box-shadow:0 5px 10px rgba(0,0,0,0.2);
+}
+
+/* TABLE */
+
+table{
+margin:auto;
+background:white;
+border-collapse:collapse;
+}
+
+td,th{
+padding:10px;
+border:1px solid #ccc;
+}
+
+/* FOOTER */
+
+footer{
+background:#ff7eb3;
+padding:12px;
+margin-top:40px;
+color:white;
+}
+
+</style>
+</head>
+
+<body>
+
+<header>
+🌸 Maha Lakshmi Website 🌸
+</header>
+
+<div class="cart">
+Cart: <span id="cartCount">0</span>
+</div>
+
+<!-- HOME -->
+<div id="home" class="page" style="display:block">
+
+<h2>Select Login</h2>
+
+<button onclick="showPage('userLogin')">User Login</button>
+<button onclick="showPage('adminLogin')">Admin Login</button>
+
+</div>
+
+<!-- REGISTER -->
+<div id="register" class="page">
+
+<h2>User Registration</h2>
+
+<input id="regName" placeholder="Name"><br>
+<input id="regPass" placeholder="Password"><br>
+
+<button onclick="register()">Register</button>
+<button onclick="showPage('userLogin')">Back</button>
+
+</div>
+
+<!-- USER LOGIN -->
+<div id="userLogin" class="page">
+
+<h2>User Login</h2>
+
+<input id="loginName" placeholder="Name"><br>
+<input id="loginPass" placeholder="Password"><br>
+
+<button onclick="login()">Login</button>
+<button onclick="showPage('register')">Register</button>
+
+</div>
+
+<!-- DASHBOARD -->
+<div id="dashboard" class="page">
+
+<h2>Products</h2>
+
+<div class="container" id="productList"></div>
+
+<button onclick="placeOrder()">Place Order (Cash on Delivery)</button>
+<br><br>
+
+<button onclick="logout()">Logout</button>
+
+</div>
+
+<!-- ADMIN LOGIN -->
+<div id="adminLogin" class="page">
+
+<h2>Admin Login</h2>
+
+<input id="adminUser" placeholder="Admin"><br>
+<input id="adminPass" placeholder="Password"><br>
+
+<button onclick="adminLogin()">Login</button>
+<button onclick="showPage('home')">Back</button>
+
+</div>
+
+<!-- ADMIN PANEL -->
+<div id="adminPanel" class="page">
+
+<h2>Admin Dashboard</h2>
+
+<h3>Add Product</h3>
+
+<input id="productName" placeholder="Product Name">
+
+<button onclick="addProduct()">Add Product</button>
+
+<h3>Customers</h3>
+
+<table id="customerTable">
+<tr><th>Name</th></tr>
+</table>
+
+<h3>Orders</h3>
+
+<table id="orderTable">
+<tr><th>User</th><th>Total Items</th></tr>
+</table>
+
+<br>
+
+<button onclick="logout()">Logout</button>
+
+</div>
+
+<footer>
+Copyright © 2024 Maha Lakshmi Website
+</footer>
+
+<script>
+
+let users=[]
+let products=["Product 1","Product 2","Product 3","Product 4"]
+let orders=[]
+let cart=0
+let currentUser=""
+
+function showPage(page){
+
+let pages=document.getElementsByClassName("page")
+
+for(let p of pages){
+p.style.display="none"
+}
+
+document.getElementById(page).style.display="block"
+
+if(page=="dashboard"){
+loadProducts()
+}
+
+}
+
+function register(){
+
+let name=document.getElementById("regName").value
+let pass=document.getElementById("regPass").value
+
+users.push({name,pass})
+
+document.getElementById("customerTable").innerHTML+=
+"<tr><td>"+name+"</td></tr>"
+
+alert("Registration Successful")
+
+showPage("userLogin")
+
+}
+
+function login(){
+
+let name=document.getElementById("loginName").value
+let pass=document.getElementById("loginPass").value
+
+for(let u of users){
+
+if(u.name==name && u.pass==pass){
+
+currentUser=name
+
+alert("Login Successful")
+
+showPage("dashboard")
+
+return
+
+}
+
+}
+
+alert("Invalid Login")
+
+}
+
+function loadProducts(){
+
+let list=document.getElementById("productList")
+
+list.innerHTML=""
+
+for(let p of products){
+
+list.innerHTML+=`
+
+<div class="card">
+<img src="https://picsum.photos/200/130?random=${Math.random()}">
+<h3>${p}</h3>
+<button onclick="addCart()">Add to Cart</button>
+</div>
+
+`
+
+}
+
+}
+
+function addCart(){
+
+cart++
+
+document.getElementById("cartCount").innerText=cart
+
+}
+
+function placeOrder(){
+
+if(cart==0){
+
+alert("Cart is empty")
+
+return
+
+}
+
+orders.push({user:currentUser,items:cart})
+
+document.getElementById("orderTable").innerHTML+=
+`<tr><td>${currentUser}</td><td>${cart}</td></tr>`
+
+alert("Order placed successfully! Payment: Cash on Delivery")
+
+cart=0
+
+document.getElementById("cartCount").innerText=cart
+
+}
+
+function adminLogin(){
+
+let user=document.getElementById("adminUser").value
+let pass=document.getElementById("adminPass").value
+
+if(user=="admin" && pass=="admin123"){
+
+showPage("adminPanel")
+
+}
+else{
+
+alert("Invalid Admin Login")
+
+}
+
+}
+
+function addProduct(){
+
+let name=document.getElementById("productName").value
+
+products.push(name)
+
+alert("Product Added")
+
+}
+
+function logout(){
+
+location.reload()
+
+}
+
+</script>
+
+</body>
+</html>
